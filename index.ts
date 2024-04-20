@@ -4,10 +4,10 @@ import Elysia from "elysia";
 import { urlController } from "./src/shortener.controller";
 
 const app = new Elysia();
+const PORT = process.env.PORT || 3005;
 
 app.use(urlController as any);
 
-app.listen(3000, () => {
-  console.log("Server is running on port 3000");
+app.listen(PORT, () => {
+    console.log(`Url Shortner is running on port ${PORT}`);
 });
-

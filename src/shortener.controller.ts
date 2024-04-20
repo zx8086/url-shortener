@@ -2,6 +2,8 @@
 import { Elysia } from "elysia";
 import { shortenUrl, fetchUrl } from "./shortener.service";
 
+const app = new Elysia();
+
 export const urlController = (app: Elysia) => {
   app.post("/shorten", async (context: any) => {
     const { longUrl } = context.body;

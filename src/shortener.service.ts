@@ -2,6 +2,9 @@ import { PrismaClient } from "@prisma/client";
 import { nanoid } from "nanoid";
 import { isURLValid } from "./utils";
 
+// Initialize Prisma client
+const prisma = new PrismaClient();
+
 //shortener.service.ts
 export async function shortenUrl(longUrl: string) {
     try {
