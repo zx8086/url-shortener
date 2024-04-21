@@ -10,11 +10,15 @@
     "typescript": "^5.0.0"
   },
   "dependencies": {
+    "@cbjsdev/cbjs": "^1.6.0",
     "@prisma/client": "^5.12.1",
+    "couchbase": "^4.3.1",
     "dotenv": "^16.4.5",
     "elysia": "^1.0.13",
     "mysql2": "^3.9.6",
     "nanoid": "^5.0.7",
-    "prisma": "^5.12.1"
+    "prisma": "^5.12.1",
+    "url": "^0.11.3",
+    "uuid": "^9.0.1"
   }
 }

@@ -1,6 +1,5 @@
 //shortener.controller.ts
 import { Elysia } from "elysia";
-import { shortenUrl, fetchUrl } from "./shortener.service";
 
 const app = new Elysia();
 
