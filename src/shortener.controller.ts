@@ -30,53 +30,23 @@ export const urlController = (app: Elysia) => {
     }
   });
 
-  app.get("/favicon.ico", (context) => {
-    context.status = 204; // No Content
-    context.end(); // This ends the request with no content being sent
-  });
-
-  app.get("/:uniqueId", async (context) => {
-    const uniqueId = context.params.uniqueId;
-    const urlDoc = await fetchUrl(uniqueId);
+  app.get("/:shortUrl", async (context) => {
+    const shortId = context.params.shortUrl;
+    const urlDoc = await fetchUrl(shortId);
 
     console.log("Fetching URL for unique ID:", urlDoc);
+    console.log('context', context)
 
     if (urlDoc) {
       // Set the permanent redirect status code and perform the redirect
       context.set.status = 301;
       context.set.redirect = urlDoc.longUrl;  // Using the redirect property as per documentation
+      context.end();  // End the request after the redirect
     } else {
-      context.status = 404;
+      context.set.status = 404;
       context.body = { message: "Page not found" };  // Return error message in the response body
     }
   });
-
-
-
-  // app.get("/:uniqueId", async (context) => {
-  //   const uniqueId = context.params.uniqueId;
-  //   const urlDoc = await fetchUrl(uniqueId);
-
-  //   console.log("Fetching URL for unique ID:", urlDoc);
-
-  //   if (urlDoc) {
-  //     // Set the permanent redirect status code
-  //     context.status = 301;
-
-  //     // Assuming Elysia allows direct manipulation of the headers
-  //     context.headers = {
-  //       'Location': urlDoc.longUrl
-  //     };
-
-  //     // Since we're setting headers directly, ensure no body is sent
-  //     context.body = "";  // Or consider using `context.end()` if that's supported to terminate the request
-  //   } else {
-  //     context.status = 404;
-  //     context.body = { message: "Page not found" };  // Return error message in the response body
-  //   }
-  // });
-
-
 };
 
 // Setup routes using the urlController

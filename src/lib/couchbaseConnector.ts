@@ -1,13 +1,16 @@
-import {
-    Bucket,
-    Cluster,
-    Collection,
-    connect,
-    ConnectOptions,
-} from 'couchbase'
+// src/lib/couchbaseConnector.ts
 
-// Connection function
-export async function connectToCouchbase() {
+import { Cluster, Collection, connect, Bucket } from 'couchbase';
+
+// Define an interface for easier management of return types
+interface CouchbaseConnection {
+    cluster: Cluster;
+    bucket: Bucket;
+    collection: Collection;
+}
+
+// Connection function using the interface
+export async function connectToCouchbase(): Promise<CouchbaseConnection> {
     console.log("Attempting to connect to Couchbase...");
 
     try {
@@ -19,49 +22,31 @@ export async function connectToCouchbase() {
         const scopeName: string = Bun.env.COUCHBASE_SCOPE;
         const collectionName: string = Bun.env.COUCHBASE_COLLECTION;
 
-        console.log(`Configuring connection with the following details: 
+        console.log(`Configuring connection with the following details:
                     URL: ${clusterConnStr}, 
                     Username: ${username}, 
                     Bucket: ${bucketName}, 
                     Scope: ${scopeName}, 
                     Collection: ${collectionName}`);
 
-        const connectOptions: ConnectOptions = {
+        const cluster: Cluster = await connect(clusterConnStr, {
             username: username,
             password: password,
-            configProfile: 'wanDevelopment'
-        };
-
-        console.log("Connecting to cluster...");
-        const cluster: Cluster = await connect(clusterConnStr, connectOptions);
-        if (!cluster) {
-            throw new Error("Failed to connect to cluster.");
-        }
+        });
         console.log("Cluster connection established.");
 
-        console.log(`Accessing bucket: ${bucketName}...`);
         const bucket: Bucket = cluster.bucket(bucketName);
-        if (!bucket) {
-            throw new Error(`Failed to access bucket: ${bucketName}`);
-        }
         console.log(`Bucket ${bucketName} accessed.`);
 
-        console.log(`Accessing scope '${scopeName}' and collection '${collectionName}'...`);
         const scope = bucket.scope(scopeName);
-        if (!scope) {
-            throw new Error(`Failed to access scope: ${scopeName}`);
-        }
         const collection: Collection = scope.collection(collectionName);
-        if (!collection) {
-            throw new Error(`Failed to access collection: ${collectionName}`);
-        }
-        console.log(`Scope '${scopeName}' and Collection '${collectionName}' accessed.`);
+        console.log(`Collection ${collectionName} accessed under scope ${scopeName}.`);
 
         console.log("Connection to Couchbase established successfully.");
 
         return { cluster, bucket, collection };
     } catch (error) {
         console.error("Couchbase connection failed:", error);
-        throw error; // Re-throw to propagate the error
+        throw error; // Ensures that errors are not silently caught
     }
-};
+}
