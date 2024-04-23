@@ -1,26 +1,25 @@
 // src/lib/couchbaseConnector.ts
+import type { Cluster, Bucket, Collection, connect } from 'couchbase';
 
-import { Cluster, Collection, connect, Bucket } from 'couchbase';
-
-// Define an interface for easier management of return types
-interface CouchbaseConnection {
+// Define the interface for the connection details
+export interface CouchbaseConnection {
     cluster: Cluster;
     bucket: Bucket;
     collection: Collection;
 }
 
-// Connection function using the interface
+// Connection function using the defined interface
 export async function connectToCouchbase(): Promise<CouchbaseConnection> {
     console.log("Attempting to connect to Couchbase...");
 
     try {
-        console.log("Reading environment variables for connection...");
-        const clusterConnStr: string = Bun.env.COUCHBASE_URL;
-        const username: string = Bun.env.COUCHBASE_USER;
-        const password: string = Bun.env.COUCHBASE_PASSWORD;
-        const bucketName: string = Bun.env.COUCHBASE_BUCKET;
-        const scopeName: string = Bun.env.COUCHBASE_SCOPE;
-        const collectionName: string = Bun.env.COUCHBASE_COLLECTION;
+        // Read environment variables for connection (assumes use of a runtime like Node.js)
+        const clusterConnStr: string = Bun.env.COUCHBASE_URL || 'couchbases://your-endpoint.couchbase.com';
+        const username: string = Bun.env.COUCHBASE_USER || 'default_user';
+        const password: string = Bun.env.COUCHBASE_PASSWORD || 'default_password';
+        const bucketName: string = Bun.env.COUCHBASE_BUCKET || 'default_bucket';
+        const scopeName: string = Bun.env.COUCHBASE_SCOPE || 'default_scope';
+        const collectionName: string = Bun.env.COUCHBASE_COLLECTION || 'default_collection';
 
         console.log(`Configuring connection with the following details:
                     URL: ${clusterConnStr}, 
@@ -31,7 +30,7 @@ export async function connectToCouchbase(): Promise<CouchbaseConnection> {
 
         const cluster: Cluster = await connect(clusterConnStr, {
             username: username,
-            password: password,
+            password: password
         });
         console.log("Cluster connection established.");
 
@@ -42,11 +41,9 @@ export async function connectToCouchbase(): Promise<CouchbaseConnection> {
         const collection: Collection = scope.collection(collectionName);
         console.log(`Collection ${collectionName} accessed under scope ${scopeName}.`);
 
-        console.log("Connection to Couchbase established successfully.");
-
         return { cluster, bucket, collection };
     } catch (error) {
         console.error("Couchbase connection failed:", error);
-        throw error; // Ensures that errors are not silently caught
+        throw error; // Re-throw the error after logging
     }
 }

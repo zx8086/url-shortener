@@ -5,16 +5,14 @@ import { UrlShortDoc } from './lib/interfaces';
 
 // Ensuring that bucket and collection are retrieved properly from the Couchbase connection
 // This function now accepts a CouchbaseConnection object which contains both cluster and collection
-export async function shortenUrl(longUrl: string, conn: CouchbaseConnection): Promise<{ message: string, shortUrl: string }> {
-  const { collection } = conn;
-
+export async function shortenUrl(longUrl: string, conn: connectToCouchbase): Promise<{ message: string, shortUrl: string }> {
   try {
     console.log("Checking if URL already exists in database...");
-    const findUrlQuery = "SELECT s.longUrl, s.shortUrl FROM `default`.`test`.`shortner` AS s WHERE s.longUrl = $longUrl LIMIT 1;";
-    const queryParams = [longUrl];
+    const query = 'SELECT s.shortUrl FROM `default`._default.shortner AS s WHERE s.longUrl = $1 LIMIT 1;';
+    const options = { parameters: [longUrl] };
 
-    // Execute the query to find an existing URL
-    const queryResult = await collection.query(findUrlQuery, { parameters: queryParams });
+    // Execute the query using the prepared statement or direct query
+    const queryResult = await conn.bucket.scope('_default').query(query, options);
 
     if (queryResult.rows.length > 0) {
       console.log("URL already exists in database, returning existing short URL.");
@@ -37,7 +35,7 @@ export async function shortenUrl(longUrl: string, conn: CouchbaseConnection): Pr
     };
 
     console.log(`Inserting new document with ID: ${shortId}`);
-    await collection.insert(shortId, newShortenerDoc);
+    await conn.collection.insert(shortId, newShortenerDoc);
     console.log("Document inserted successfully.");
 
     return {
@@ -46,9 +44,11 @@ export async function shortenUrl(longUrl: string, conn: CouchbaseConnection): Pr
     };
   } catch (error) {
     console.error("Failed to shorten URL:", error);
-    throw error; // Properly propagate errors
+    throw error;
   }
 }
+
+
 // Function to fetch a URL
 export async function fetchUrl(urlUniqueId: string): Promise<UrlShortDoc | null> {
   try {
