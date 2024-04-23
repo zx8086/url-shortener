@@ -1,6 +1,3 @@
-// couchbaseConnector.ts
-// This module is responsible for connecting to the Couchbase database.
-
 import {
     Bucket,
     Cluster,
@@ -9,8 +6,10 @@ import {
     ConnectOptions,
 } from 'couchbase'
 
+// Connection function
 export async function connectToCouchbase() {
     console.log("Attempting to connect to Couchbase...");
+
     try {
         console.log("Reading environment variables for connection...");
         const clusterConnStr: string = Bun.env.COUCHBASE_URL;
@@ -20,7 +19,7 @@ export async function connectToCouchbase() {
         const scopeName: string = Bun.env.COUCHBASE_SCOPE;
         const collectionName: string = Bun.env.COUCHBASE_COLLECTION;
 
-        console.log(`Configuring connection with the following details:
+        console.log(`Configuring connection with the following details: 
                     URL: ${clusterConnStr}, 
                     Username: ${username}, 
                     Bucket: ${bucketName}, 
@@ -65,4 +64,4 @@ export async function connectToCouchbase() {
         console.error("Couchbase connection failed:", error);
         throw error; // Re-throw to propagate the error
     }
-}
+};

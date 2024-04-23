@@ -1,73 +1,75 @@
-// Import required modules
-import { cluster, Bucket, Collection } from 'couchbase';
-import url from 'url';  // A standard library for URL parsing
-import { v4 as uuidv4 } from 'uuid'; // For more robust unique IDs
+// src/shortener.service.ts
+import { connectToCouchbase } from './lib/couchbaseConnector';
+import { v4 as uuidv4 } from 'uuid';
+import { UrlShortDoc } from './lib/interfaces';
 
-// Establish connection to Couchbase cluster
-const cluster = new Cluster(Bun.env.COUCHBASE_URL, {
-  username: Bun.env.COUCHBASE_USER,
-  password: Bun.env.COUCHBASE_PASSWORD
-});
-const bucket: Bucket = cluster.bucket('default');
-const scope = bucket.scope('test');
-const collection: Collection = scope.collection('shortner');
-
-function sanitizeInput(input) {
-  const allowedCharacters = /^[a-zA-Z0-9\-_\.]+$/; // Regular expression 
-  return input.replace(/[^a-zA-Z0-9\-_\.]/g, ''); // Replace unsafe characters
-}
-
-// Enhance URL Validation
-function isURLValid(longUrl) {
+export async function shortenUrl(longUrl: string, cluster: Cluster, collection: Collection): Promise<{ message: string, shortUrl: string }> {
   try {
-    new url.URL(longUrl);
-    return true;
-  } catch (error) {
-    return false;
-  }
-}
+    console.log("Starting the URL shortening process...");
 
-// Function to shorten a URL
-export async function shortenUrl(submittedLongUrl: string) {
-  try {
-    // Sanitize the long URL
-    const longUrl = sanitizeInput(submittedLongUrl);
+    // Assuming 'test' is the scope and 'shortener' is the collection as per your query
+    const bucket = cluster.bucket('default'); // Ensure this is the correct bucket name
+    const scope = bucket.scope('test'); // Adjust the scope name as per your setup
 
-    // Validate the URL
-    const isValidUrl = isURLValid(longUrl);
-    if (!isValidUrl) throw new Error("Invalid URL. Please enter a valid URL and try again");
+    console.log("Checking if URL already exists in database...");
+    console.log("Executing query...");
 
-    // Check if URL already exists
-    const existingDoc = await collection.get(longUrl).catch(() => null);
-    if (existingDoc) return existingDoc.content.shortUrl;
+    const findUrlQuery = "SELECT s.longUrl, s.shortUrl FROM `shortener` AS s WHERE s.longUrl = $1 LIMIT 1;";
+    const queryParams = { parameters: [longUrl] };
 
-    const baseUrl = process.env.BASE_URL;
-    const port = process.env.PORT;
+    // Execute the query on the specified scope
+    const result = await scope.query(findUrlQuery, queryParams);
+
+    console.log("Query executed, checking results...");
+    if (result.rows.length > 0) {
+      console.log("URL already exists in database.");
+      return {
+        message: "URL already shortened",
+        shortUrl: result.rows[0].shortUrl
+      };
+    }
+
+    console.log("URL not found, creating new shortened URL...");
+    const baseUrl = process.env.BASE_URL || 'http://localhost';
+    const port = process.env.PORT || '3005';
     const shortId = uuidv4().slice(0, 8);
     const shortUrl = `${baseUrl}:${port}/${shortId}`;
 
-    // Insert new URL document into Couchbase
-    await collection.upsert(shortId, {
+    const newShortenerDoc: UrlShortDoc = {
       longUrl,
       shortUrl,
-      shortId
-    });
+      createdAt: new Date().toISOString()
+    };
 
+    console.log("Inserting new document...");
+    await collection.upsert(shortId, newShortenerDoc);
+    console.log("Document inserted successfully.");
     return {
       message: "URL shortened successfully",
       shortUrl
     };
   } catch (error) {
+    console.error("Failed to shorten URL:", error);
     throw error;
   }
 }
 
 // Function to fetch a URL
-export async function fetchUrl(urlUniqueId: string) {
+export async function fetchUrl(urlUniqueId: string): Promise<UrlShortDoc | null> {
   try {
+    const { collection } = await connectToCouchbase();
+    console.log(`Fetching document for ID: ${urlUniqueId}`);
+
     const result = await collection.get(urlUniqueId);
-    return result.content;
+    return result.content as UrlShortDoc;
   } catch (error) {
-    throw error;
+    // Check if the error is a document not found error
+    if (error.code === 13) { // Couchbase error code 13 corresponds to "document not found"
+      console.log(`No document found for ID: ${urlUniqueId}`);
+      return null;
+    } else {
+      console.error("Error fetching URL:", error);
+      throw error; // Propagate unexpected errors
+    }
   }
 }
