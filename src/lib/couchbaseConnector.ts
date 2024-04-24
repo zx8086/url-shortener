@@ -1,11 +1,13 @@
 // src/lib/couchbaseConnector.ts
-import type { Cluster, Bucket, Collection, connect } from 'couchbase';
+import { connect } from 'couchbase';  // Regular import for the function used at runtime
+import type { Cluster, Bucket, Collection } from 'couchbase';  // Type-only imports
 
 // Define the interface for the connection details
 export interface CouchbaseConnection {
     cluster: Cluster;
     bucket: Bucket;
     collection: Collection;
+    connect: typeof connect;
 }
 
 // Connection function using the defined interface
@@ -13,13 +15,12 @@ export async function connectToCouchbase(): Promise<CouchbaseConnection> {
     console.log("Attempting to connect to Couchbase...");
 
     try {
-        // Read environment variables for connection (assumes use of a runtime like Node.js)
-        const clusterConnStr: string = Bun.env.COUCHBASE_URL || 'couchbases://your-endpoint.couchbase.com';
-        const username: string = Bun.env.COUCHBASE_USER || 'default_user';
-        const password: string = Bun.env.COUCHBASE_PASSWORD || 'default_password';
-        const bucketName: string = Bun.env.COUCHBASE_BUCKET || 'default_bucket';
-        const scopeName: string = Bun.env.COUCHBASE_SCOPE || 'default_scope';
-        const collectionName: string = Bun.env.COUCHBASE_COLLECTION || 'default_collection';
+        const clusterConnStr: string = Bun.env.COUCHBASE_URL;
+        const username: string = Bun.env.COUCHBASE_USERNAME;
+        const password: string = Bun.env.COUCHBASE_PASSWORD;
+        const bucketName: string = Bun.env.COUCHBASE_BUCKET;
+        const scopeName: string = Bun.env.COUCHBASE_SCOPE;
+        const collectionName: string = Bun.env.COUCHBASE_COLLECTION;
 
         console.log(`Configuring connection with the following details:
                     URL: ${clusterConnStr}, 
@@ -41,7 +42,7 @@ export async function connectToCouchbase(): Promise<CouchbaseConnection> {
         const collection: Collection = scope.collection(collectionName);
         console.log(`Collection ${collectionName} accessed under scope ${scopeName}.`);
 
-        return { cluster, bucket, collection };
+        return { cluster, bucket, collection, connect };
     } catch (error) {
         console.error("Couchbase connection failed:", error);
         throw error; // Re-throw the error after logging
