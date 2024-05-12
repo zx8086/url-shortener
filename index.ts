@@ -1,17 +1,23 @@
 // index.ts
-
 import Elysia from "elysia";
-import { urlController } from "./src/shorten.controller.ts";
+import { urlController } from "./src/controller.ts";
+import config from './config';
 
 const app = new Elysia();
 
-// Ensure the PORT environment variable is available
-const PORT = Bun.env.PORT || '3005'; // Provide a default value if not set
+if (typeof app === 'undefined') {
+    throw new Error('Could not initialize Elysia');
+}
 
-// Properly apply the controller to your app
-urlController(app); // Assuming urlController is a function that takes an app instance
+// Apply the controller to your app
+urlController(app);
 
 // Start listening on the configured port
-app.listen(parseInt(PORT, 10), () => { // Ensure port is treated as a number
-    console.log(`URL Shortener is running on port ${PORT}`);
+const port = parseInt(config.elysiaJs.PORT, 10);
+if (isNaN(port)) {
+    throw new Error('Invalid port number');
+}
+
+app.listen(port, () => {
+    console.log(`URL Shortener is running on port ${port}`);
 });

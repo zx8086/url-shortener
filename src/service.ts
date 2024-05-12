@@ -1,8 +1,7 @@
-// src/shorten.service.ts
+// src/service.ts
 import { connectToCouchbase } from './lib/couchbaseConnector';
-// import { v4 as uuidv4 } from 'uuid';
 import { ulid } from 'ulid';
-import type { UrlShortDoc } from './lib/interfaces';
+import type { UrlShortDoc, CouchbaseError } from './lib/interfaces';
 import {MutationResult} from "couchbase";
 
 export async function shortenUrl(longUrl: string): Promise<{ message: string, shortUrl: string }> {
@@ -27,7 +26,6 @@ export async function shortenUrl(longUrl: string): Promise<{ message: string, sh
     console.log("URL not found, creating new shortened URL...");
     const baseUrl = process.env.BASE_URL || 'http://localhost';
     const port = process.env.PORT || '3005';
-    // const shortId = uuidv4().slice(0, 8);
     const shortId = ulid();
     const shortUrl = `${baseUrl}:${port}/${shortId}`;
 
@@ -50,7 +48,7 @@ export async function shortenUrl(longUrl: string): Promise<{ message: string, sh
     };
 
   } catch (error) {
-    console.error("Failed to shorten URL:", error);
+    console.error("Failed to shorten URL:", (error as CouchbaseError).message); // CouchbaseError here now refers to the one imported from interfaces.ts
     throw error;
   }
 }
@@ -64,12 +62,11 @@ export async function fetchUrl(urlUniqueId: string): Promise<UrlShortDoc | null>
     const result = await collection.get(urlUniqueId);
     return result.content as UrlShortDoc;
   } catch (error) {
-    // Check if the error is a document not found error
-    if (error.code === 13) { // Couchbase error code 13 corresponds to "document not found"
+    if ((error as CouchbaseError).code === 13) { // Couchbase error code 13 corresponds to "document not found"
       console.log(`No document found for ID: ${urlUniqueId}`);
       return null;
     } else {
-      console.error("Error fetching URL:", error);
+      console.error("Error fetching URL:", (error as CouchbaseError).message);
       throw error; // Propagate unexpected errors
     }
   }

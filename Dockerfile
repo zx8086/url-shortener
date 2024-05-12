@@ -2,7 +2,6 @@ FROM oven/bun
 
 WORKDIR /app
 
-COPY ./prisma prisma
 COPY package.json .
 COPY bun.lockb .
 
