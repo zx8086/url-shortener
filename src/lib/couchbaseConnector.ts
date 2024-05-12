@@ -15,12 +15,12 @@ export async function connectToCouchbase(): Promise<CouchbaseConnection> {
     console.log("Attempting to connect to Couchbase...");
 
     try {
-        const clusterConnStr: string = Bun.env.COUCHBASE_URL;
-        const username: string = Bun.env.COUCHBASE_USERNAME;
-        const password: string = Bun.env.COUCHBASE_PASSWORD;
-        const bucketName: string = Bun.env.COUCHBASE_BUCKET;
-        const scopeName: string = Bun.env.COUCHBASE_SCOPE;
-        const collectionName: string = Bun.env.COUCHBASE_COLLECTION;
+        const clusterConnStr: string = <string>Bun.env.COUCHBASE_URL;
+        const username: string = <string>Bun.env.COUCHBASE_USERNAME;
+        const password: string = <string>Bun.env.COUCHBASE_PASSWORD;
+        const bucketName: string = <string>Bun.env.COUCHBASE_BUCKET;
+        const scopeName: string = <string>Bun.env.COUCHBASE_SCOPE;
+        const collectionName: string = <string>Bun.env.COUCHBASE_COLLECTION;
 
         console.log(`Configuring connection with the following details:
                     URL: ${clusterConnStr}, 

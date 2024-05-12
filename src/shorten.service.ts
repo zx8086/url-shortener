@@ -1,7 +1,9 @@
-// src/shortener.service.ts
+// src/shorten.service.ts
 import { connectToCouchbase } from './lib/couchbaseConnector';
-import { v4 as uuidv4 } from 'uuid';
+// import { v4 as uuidv4 } from 'uuid';
+import { ulid } from 'ulid';
 import type { UrlShortDoc } from './lib/interfaces';
+import {MutationResult} from "couchbase";
 
 export async function shortenUrl(longUrl: string): Promise<{ message: string, shortUrl: string }> {
   const { cluster, collection } = await connectToCouchbase();
@@ -17,15 +19,16 @@ export async function shortenUrl(longUrl: string): Promise<{ message: string, sh
     if (queryResult.rows.length > 0) {
       console.log("URL already exists in database, returning existing short URL.");
       return {
-        message: "URL already shortened",
-        shortUrl: queryResult.rows[0].shortUrl
+        shortUrl: queryResult.rows[0].shortUrl,
+        message: "URL already shortened"
       };
     }
 
     console.log("URL not found, creating new shortened URL...");
     const baseUrl = process.env.BASE_URL || 'http://localhost';
     const port = process.env.PORT || '3005';
-    const shortId = uuidv4().slice(0, 8);
+    // const shortId = uuidv4().slice(0, 8);
+    const shortId = ulid();
     const shortUrl = `${baseUrl}:${port}/${shortId}`;
 
     const newShortenerDoc: UrlShortDoc = {
@@ -35,21 +38,22 @@ export async function shortenUrl(longUrl: string): Promise<{ message: string, sh
     };
 
     console.log(`Inserting new document with ID: ${shortId}`);
-    await collection.upsert(shortId, newShortenerDoc);
+    let cbUpsert: MutationResult;
+    cbUpsert = await collection.upsert(shortId, newShortenerDoc);
+    console.log(`Couchbase Upsert Result:`, cbUpsert);
     console.log("Document inserted successfully.");
+    console.log("URL shortened successfully")
 
     return {
-      message: "URL shortened successfully",
-      shortUrl: shortUrl
+      "shortUrl": shortUrl,
+      "message": "URL shortened successfully"
     };
+
   } catch (error) {
     console.error("Failed to shorten URL:", error);
     throw error;
   }
 }
-
-
-
 
 // Function to fetch a URL
 export async function fetchUrl(urlUniqueId: string): Promise<UrlShortDoc | null> {

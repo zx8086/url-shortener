@@ -1,7 +1,7 @@
 // index.ts
 
 import Elysia from "elysia";
-import { urlController } from "./src/shortener.controller";
+import { urlController } from "./src/shorten.controller.ts";
 
 const app = new Elysia();
 
