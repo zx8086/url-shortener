@@ -48,7 +48,7 @@ export async function shortenUrl(longUrl: string): Promise<{ message: string, sh
     };
 
   } catch (error) {
-    console.error("Failed to shorten URL:", (error as CouchbaseError).message); // CouchbaseError here now refers to the one imported from interfaces.ts
+    console.error("Failed to shorten URL:", (error as CouchbaseError).message);
     throw error;
   }
 }
