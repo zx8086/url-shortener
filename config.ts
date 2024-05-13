@@ -10,6 +10,7 @@ export interface CouchbaseConfig {
 
 export interface ElysiaConfig {
   PORT: string;
+  BASE_URL: string
 }
 
 export interface Config {
@@ -35,6 +36,7 @@ const couchbaseConfig: CouchbaseConfig = {
 
 const elysiaConfig: ElysiaConfig = {
   PORT: getOrThrow(Bun.env.PORT, 'PORT') || '3005',
+  BASE_URL: getOrThrow(Bun.env.BASE_URL, 'BASE_URL') || 'http://localhost',
 };
 
 const config: Config = {

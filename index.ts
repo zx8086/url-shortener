@@ -13,7 +13,7 @@ if (typeof app === 'undefined') {
 urlController(app);
 
 // Start listening on the configured port
-const port = parseInt(config.elysiaJs.PORT, 10);
+const port :number = parseInt(config.elysiaJs.PORT, 10);
 if (isNaN(port)) {
     throw new Error('Invalid port number');
 }
