@@ -12,11 +12,13 @@ export async function shortenUrl(longUrl: string): Promise<{ message: string, sh
 
     console.log("Checking if URL already exists in database...");
 
-    const query = 'SELECT META().id as id, s.shortUrl FROM `default`.test.shortner AS s WHERE s.longUrl = $1 LIMIT 1;';
+    const query = 'SELECT META().id as shortId, s.shortUrl FROM `default`.test.shortner AS s WHERE s.longUrl = $1 LIMIT 1;';
     const options = { parameters: [longUrl] };
 
     // Execute the query using the cluster
     const queryResult = await cluster.query(query, options);
+
+    console.log(queryResult)
 
     if (queryResult.rows.length > 0) {
 
@@ -83,7 +85,7 @@ export async function fetchUrl(urlUniqueId: string): Promise<UrlShortDoc | null>
 
       console.error("Error fetching URL:", (error as CouchbaseError).message);
 
-      throw error; // Propagate unexpected errors
+      throw error;
     }
   }
 }

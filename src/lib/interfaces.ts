@@ -10,7 +10,7 @@ export interface UrlShortDoc {
 // CouchbaseError interface is for error handling with Couchbase
 export interface CouchbaseError {
     code: number;
-    message?: string;
+    message?: string; // optional parameter
 }
 
 // RequestBody interface is used for handling HTTP request body with a longUrl property
@@ -20,5 +20,5 @@ export interface RequestBody {
 
 // CustomError interface is used for creating standardised error objects
 export interface CustomError {
-    message?: string;
+    message?: string; // optional parameter
 }
