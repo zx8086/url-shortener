@@ -1,0 +1,11 @@
+GET http://localhost:3005/01HY6PRZA00MMAVFZA1C2A51ES
+Accept: application/json
+
+###
+## Ge
+POST http://localhost:3005//shorten
+Content-Type: application/json
+
+{
+  "longUrl" : "https://www.smashingmagazine.com/2024/05/designers-business-ux-language"
+}
