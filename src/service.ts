@@ -1,12 +1,13 @@
 // src/service.ts
+import { getCluster } from './lib/clusterProvider.ts';
+
 import config from '../config.ts';
-import { connectToCouchbase } from './lib/couchbaseConnector';
 import {MutationResult} from "couchbase";
 import type { UrlShortDoc, CouchbaseError } from './lib/interfaces';
 import { ulid } from 'ulid';
 
 export async function shortenUrl(longUrl: string): Promise<{ message: string, shortUrl: string }> {
-  const { cluster, collection } = await connectToCouchbase();
+  const { cluster, bucket, scope, collection } = await getCluster();
 
   try {
 
@@ -66,7 +67,7 @@ export async function shortenUrl(longUrl: string): Promise<{ message: string, sh
 // Function to fetch a URL
 export async function fetchUrl(urlUniqueId: string): Promise<UrlShortDoc | null> {
   try {
-    const { collection } = await connectToCouchbase();
+    const { cluster, bucket, scope, collection } = await getCluster();
 
     console.log(`Fetching document for ID: ${urlUniqueId}`);
 
