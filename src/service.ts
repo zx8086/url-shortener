@@ -1,23 +1,22 @@
 // src/service.ts
 import { getCluster } from './lib/clusterProvider.ts';
-
 import config from '../config.ts';
-import {MutationResult} from "couchbase";
-import type { UrlShortDoc, CouchbaseError } from './lib/interfaces';
+import { MutationResult, QueryResult} from "couchbase";
+import type { UrlShortDoc, CouchbaseError, Options, ClusterConfig, ShortenUrlResult} from './lib/interfaces';
 import { ulid } from 'ulid';
 
-export async function shortenUrl(longUrl: string): Promise<{ message: string, shortUrl: string }> {
-  const { cluster, bucket, scope, collection } = await getCluster();
+export async function shortenUrl(longUrl: string): Promise<ShortenUrlResult | null> {
+  const { cluster, collection }: ClusterConfig = await getCluster();
 
   try {
 
     console.log("Checking if URL already exists in database...");
 
-    const query = 'SELECT META().id as shortId, s.shortUrl FROM `default`.test.shortner AS s WHERE s.longUrl = $1 LIMIT 1;';
-    const options = { parameters: [longUrl] };
+    const query: string = 'SELECT META().id as shortId, s.shortUrl FROM `default`.test.shortner AS s WHERE s.longUrl = $1 LIMIT 1;';
+    const options: Options = { parameters: [longUrl] };
 
     // Execute the query using the cluster
-    const queryResult = await cluster.query(query, options);
+    const queryResult: QueryResult = await cluster.query(query, options);
 
     console.log(queryResult)
 
@@ -67,7 +66,7 @@ export async function shortenUrl(longUrl: string): Promise<{ message: string, sh
 // Function to fetch a URL
 export async function fetchUrl(urlUniqueId: string): Promise<UrlShortDoc | null> {
   try {
-    const { cluster, bucket, scope, collection } = await getCluster();
+    const { collection }: ClusterConfig = await getCluster();
 
     console.log(`Fetching document for ID: ${urlUniqueId}`);
 
@@ -77,15 +76,11 @@ export async function fetchUrl(urlUniqueId: string): Promise<UrlShortDoc | null>
 
   } catch (error) {
     if ((error as CouchbaseError).code === 13) { // Couchbase error code 13 corresponds to "document not found"
-
       console.log(`No document found for ID: ${urlUniqueId}`);
 
       return null;
-
     } else {
-
       console.error("Error fetching URL:", (error as CouchbaseError).message);
-
       throw error;
     }
   }
