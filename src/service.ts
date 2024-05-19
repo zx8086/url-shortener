@@ -6,19 +6,22 @@ import type { UrlShortDoc, CouchbaseError, Options, ClusterConfig, ShortenUrlRes
 import { ulid } from 'ulid';
 
 export async function shortenUrl(longUrl: string): Promise<ShortenUrlResult | null> {
-  const { cluster, collection }: ClusterConfig = await getCluster();
-
   try {
+
+    const { cluster, collection }: ClusterConfig = await getCluster();
 
     console.log("Checking if URL already exists in database...");
 
-    const query: string = 'SELECT META().id as shortId, s.shortUrl FROM `default`.test.shortner AS s WHERE s.longUrl = $1 LIMIT 1;';
-    const options: Options = { parameters: [longUrl] };
+    const query: any = 'SELECT META().id AS shortId, s.shortUrl FROM `default`.test.shortner AS s WHERE s.longUrl = $1 LIMIT 1;';
+
+    const options: Options  = { parameters: [longUrl] };
+
+    console.log("Options:", options);
 
     // Execute the query using the cluster
     const queryResult: QueryResult = await cluster.query(query, options);
 
-    console.log(queryResult)
+    console.log(JSON.stringify(queryResult, null, 2));
 
     if (queryResult.rows.length > 0) {
 
