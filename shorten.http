@@ -1,11 +1,11 @@
+###
 GET http://localhost:3005/01HY8AT7H932WF7PNJWXTBQXF9
 Accept: application/json
 
-###
 ###
 POST http://localhost:3005//shorten
 Content-Type: application/json
 
 {
-  "longUrl" : "https://www.youtube.com/watch?v=dqmtzHB2zTM"
+  "longUrl" : "https://www.marktechpost.com/2024/05/18/enhancing-graph-classification-with-edge-node-attention-based-differentiable-pooling-and-multi-distance-graph-neural-networks-gnns/?ref=dailydev"
 }
