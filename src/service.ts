@@ -62,9 +62,11 @@ export async function shortenUrl(longUrl: string): Promise<ShortenUrlResult> {
       "message": "URL shortened successfully"
     };
 
-  } catch (error) {
-    console.error("Failed to shorten URL:", (error as CouchbaseError).message);
-    throw error;
+  } catch (error: any) {
+    console.error("Failed to shorten URL:", error.message);
+
+    // Convert to a new error type that can be correctly handled in urlController
+    throw { name: error.constructor.name, message: error.message };
   }
 }
 
