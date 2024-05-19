@@ -36,10 +36,6 @@ export interface RequestBody {
     longUrl: string;
 }
 
-export interface CustomError {
-    message?: string; // optional parameter
-}
-
 export interface Options {
     parameters: string[];
 }
