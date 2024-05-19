@@ -1,7 +1,7 @@
 import Elysia from 'elysia';
 import { shortenUrl, fetchUrl } from './service.ts';
 import { isURLValid } from './lib/utils';
-import type { ShortenUrlResult, RequestBody, CustomError, UrlShortDoc, OperationResult } from './lib/interfaces';
+import type { ShortenUrlResult, RequestBody, CustomError, OperationResult } from './lib/interfaces';
 
 const app = new Elysia();
 
@@ -40,7 +40,7 @@ export const urlController = (app: Elysia) => {
       async (context) : Promise<any> => {
 
     const shortId : string = context.params.shortUrl;
-    const urlDoc : UrlShortDoc | null = await fetchUrl(shortId);
+    const urlDoc : any = await fetchUrl(shortId);
 
     console.log("Fetching URL for unique ID:", urlDoc);
     console.log('context', context)
