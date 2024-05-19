@@ -13,7 +13,6 @@ export const urlController = (app: Elysia): void => {
 
           console.log("Received URL: ", longUrl);
 
-          // check if longUrl is provided and valid
           if (!longUrl || !isURLValid(longUrl)) {
             context.set.status = 400;
             console.log(`Url is invalid: ${longUrl}`);
@@ -30,7 +29,7 @@ export const urlController = (app: Elysia): void => {
 
         } catch (error: any) {
           let message = error.message || 'Failed to shorten URL';
-          let status = 500;
+          let status: number = 500;
 
           if (error.name === 'DocumentNotFoundError') {
             status = 404;
