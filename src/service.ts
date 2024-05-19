@@ -19,10 +19,12 @@ export async function shortenUrl(longUrl: string): Promise<ShortenUrlResult> {
     const { cluster, collection }: ClusterConfig = await getCluster();
 
     console.log("Checking if URL already exists in database...");
-    const query: any = n1qlCheckURLExist;
 
+    const query: string = n1qlCheckURLExist;
     const options: Options  = { parameters: [longUrl] };
+
     const queryResult: QueryResult = await cluster.query(query, options);
+
     console.log(JSON.stringify(queryResult, null, 2));
 
     if (queryResult.rows.length > 0) {
@@ -35,7 +37,7 @@ export async function shortenUrl(longUrl: string): Promise<ShortenUrlResult> {
       };
     }
 
-    console.log("URL not found, creating new shortened URL...");
+    console.log("URL not found, creating new short URL...");
 
     const baseUrl : string = config.elysiaJs.BASE_URL;
     const port : string = config.elysiaJs.PORT;
@@ -65,7 +67,6 @@ export async function shortenUrl(longUrl: string): Promise<ShortenUrlResult> {
   } catch (error: any) {
     console.error("Failed to shorten URL:", error.message);
 
-    // Convert to a new error type that can be correctly handled in urlController
     throw { name: error.constructor.name, message: error.message };
   }
 }
