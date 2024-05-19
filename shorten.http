@@ -1,4 +1,4 @@
-GET http://localhost:3005/01HY87GQBFM4GM70MF7530EWZ0
+GET http://localhost:3005/01HY8AT7H932WF7PNJWXTBQXF9
 Accept: application/json
 
 ###
@@ -7,5 +7,5 @@ POST http://localhost:3005//shorten
 Content-Type: application/json
 
 {
-  "longUrl" : "https://www.jetbrains.com/rider/whatsnew/"
+  "longUrl" : "https://www.youtube.com/watch?v=dqmtzHB2zTM"
 }

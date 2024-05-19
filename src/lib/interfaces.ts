@@ -23,6 +23,7 @@ export interface ErrorResponse {
     url?: string; // The url is optional because it's not present in the second error case
     shortUrl?: string; // The shortUrl is only present in one of the error cases
     code?: number; // Some optional additional info
+    longUrl?: string;
     message: string;
 }
 
@@ -43,7 +44,6 @@ export interface Options {
     parameters: string[];
 }
 
-
-export type FetchUrlResult = UrlShortDoc | ErrorResponse | null;
+export type FetchUrlResult = UrlShortDoc | ErrorResponse | undefined | null;
 export type OperationResult = ShortenUrl | ErrorResponse | null;
 export type ShortenUrlResult = ShortenUrl | ErrorResponse | null;
