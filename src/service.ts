@@ -1,8 +1,9 @@
 // src/service.ts
 import { getCluster } from './lib/clusterProvider.ts';
 import config from '../config.ts';
-import { MutationResult, QueryResult} from "couchbase";
+import type { MutationResult, QueryResult} from "couchbase";
 import type { UrlShortDoc, CouchbaseError, Options, ClusterConfig, ShortenUrlResult} from './lib/interfaces';
+import  { n1qlCheckURLExist } from './../queries/n1qlQueries'
 import { ulid } from 'ulid';
 
 export async function shortenUrl(longUrl: string): Promise<ShortenUrlResult | null> {
@@ -11,7 +12,7 @@ export async function shortenUrl(longUrl: string): Promise<ShortenUrlResult | nu
     const { cluster, collection }: ClusterConfig = await getCluster();
 
     console.log("Checking if URL already exists in database...");
-    const query: any = 'SELECT META().id AS shortId, s.shortUrl FROM `default`.test.shortner AS s WHERE s.longUrl = $1 LIMIT 1;';
+    const query: any = n1qlCheckURLExist;
 
     const options: Options  = { parameters: [longUrl] };
     const queryResult: QueryResult = await cluster.query(query, options);
@@ -42,10 +43,10 @@ export async function shortenUrl(longUrl: string): Promise<ShortenUrlResult | nu
 
     console.log(`Inserting new document with ID: ${shortId}`);
 
-    let cbUpsert: MutationResult;
-    cbUpsert = await collection.upsert(shortId, newShortenerDoc);
+    let addNewShortenDoc: MutationResult;
+    addNewShortenDoc = await collection.upsert(shortId, newShortenerDoc);
 
-    console.log(`Couchbase Upsert Result:`, cbUpsert);
+    console.log(`Couchbase Upsert Result:`,  addNewShortenDoc);
     console.log("Document inserted successfully.");
     console.log("URL shortened successfully")
 
