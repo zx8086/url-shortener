@@ -12,3 +12,4 @@ COPY . .
 EXPOSE 3005
 
 CMD ["bun", "index.ts"]
+
