@@ -2,7 +2,14 @@
 import { getCluster } from './lib/clusterProvider.ts';
 import config from '../config.ts';
 import type { MutationResult, QueryResult} from "couchbase";
-import type { UrlShortDoc, CouchbaseError, Options, ClusterConfig, ShortenUrlResult} from './lib/interfaces';
+import type {
+  UrlShortDoc,
+  CouchbaseError,
+  Options,
+  ClusterConfig,
+  ShortenUrlResult,
+  FetchUrlResult
+} from './lib/interfaces';
 import  { n1qlCheckURLExist } from './../queries/n1qlQueries'
 import { ulid } from 'ulid';
 
@@ -62,7 +69,7 @@ export async function shortenUrl(longUrl: string): Promise<ShortenUrlResult | nu
 }
 
 // Function to fetch a URL
-export async function fetchUrl(urlUniqueId: string): Promise<UrlShortDoc | null> {
+export async function fetchUrl(urlUniqueId: string): Promise<FetchUrlResult> {
   try {
     const { collection }: ClusterConfig = await getCluster();
 

@@ -42,4 +42,11 @@ export interface Options {
     parameters: string[];
 }
 
+export interface FetchError {
+    message: string;
+    code?: number; // Some optional additional info
+}
+
+export type FetchUrlResult = UrlShortDoc | FetchError | null;
+
 export type OperationResult = ShortenUrlResult | ErrorResponse | null;
