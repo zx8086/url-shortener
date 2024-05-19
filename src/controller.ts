@@ -1,13 +1,13 @@
 import Elysia from 'elysia';
 import { shortenUrl, fetchUrl } from './service.ts';
 import { isURLValid } from './lib/utils';
-import type { ShortenUrlResult, RequestBody, CustomError, UrlShortDoc } from './lib/interfaces';
+import type { ShortenUrlResult, RequestBody, CustomError, UrlShortDoc, OperationResult } from './lib/interfaces';
 
 const app = new Elysia();
 
 export const urlController = (app: Elysia) => {
   app.post("/shorten",
-      async (context) : Promise<ShortenUrlResult | null> => {
+      async (context) : Promise<OperationResult> => {
         try {
           const longUrl: string = (context.body as RequestBody).longUrl;
 
@@ -16,7 +16,7 @@ export const urlController = (app: Elysia) => {
           // check if longUrl is provided and valid
           if (!longUrl || !isURLValid(longUrl)) {
             context.set.status = 400;
-            return {shortUrl: "", message: "Invalid or no URL provided."};
+            return {url: longUrl, message: "Invalid or no URL provided."};
           }
 
           console.log("URL valid, attempting to shorten:", longUrl);

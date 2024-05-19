@@ -19,6 +19,12 @@ export interface UrlShortDoc {
     createdAt?: string; // optional parameter
 }
 
+export interface ErrorResponse {
+    url?: string; // The url is optional because it's not present in the second error case
+    shortUrl?: string; // The shortUrl is only present in one of the error cases
+    message: string;
+}
+
 export interface CouchbaseError {
     code: number;
     message?: string; // optional parameter
@@ -35,3 +41,5 @@ export interface CustomError {
 export interface Options {
     parameters: string[];
 }
+
+export type OperationResult = ShortenUrlResult | ErrorResponse | null;

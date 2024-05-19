@@ -2,10 +2,10 @@ GET http://localhost:3005/01HY73B00Y03K1VN3TT9DZR9JN
 Accept: application/json
 
 ###
-## Ge
+###
 POST http://localhost:3005//shorten
 Content-Type: application/json
 
 {
-  "longUrl" : "https://www.google.com"
+  "longUrl" : "httpa://awstip.com"
 }
