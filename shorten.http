@@ -7,5 +7,5 @@ POST http://localhost:3005//shorten
 Content-Type: application/json
 
 {
-  "longUrl" : "https://www.smashingmagazine.com/2024/05/designers-business-ux-language/?ref=dailydev"
+  "longUrl" : "https://awstip.com/unlocking-seamless-deployment-a-step-by-step-guide-to-deploy-code-on-amazon-ecs-fargate-new-ea391097fd96"
 }
