@@ -1,13 +1,13 @@
 import Elysia from 'elysia';
 import { shortenUrl, fetchUrl } from './service.ts';
 import { isURLValid } from './lib/utils';
-import type { ShortenUrlResult, RequestBody, CustomError, OperationResult } from './lib/interfaces';
+import type {ShortenUrlResult, RequestBody, CustomError, FetchUrlResult, OperationResult, ErrorResponse} from './lib/interfaces';
 
 const app = new Elysia();
 
 export const urlController = (app: Elysia) => {
   app.post("/shorten",
-      async (context) : Promise<OperationResult> => {
+      async (context) : Promise<ShortenUrlResult> => {
         try {
           const longUrl: string = (context.body as RequestBody).longUrl;
 

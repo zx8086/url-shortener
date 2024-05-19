@@ -8,7 +8,7 @@ export interface ClusterConfig {
     collection: Collection;
 }
 
-export interface ShortenUrlResult {
+export interface ShortenUrl {
     message: string;
     shortUrl: string;
 }
@@ -22,6 +22,7 @@ export interface UrlShortDoc {
 export interface ErrorResponse {
     url?: string; // The url is optional because it's not present in the second error case
     shortUrl?: string; // The shortUrl is only present in one of the error cases
+    code?: number; // Some optional additional info
     message: string;
 }
 
@@ -42,11 +43,7 @@ export interface Options {
     parameters: string[];
 }
 
-export interface FetchError {
-    message: string;
-    code?: number; // Some optional additional info
-}
 
-export type FetchUrlResult = UrlShortDoc | FetchError | null;
-
-export type OperationResult = ShortenUrlResult | ErrorResponse | null;
+export type FetchUrlResult = UrlShortDoc | ErrorResponse | null;
+export type OperationResult = ShortenUrl | ErrorResponse | null;
+export type ShortenUrlResult = ShortenUrl | ErrorResponse | null;

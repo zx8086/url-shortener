@@ -13,7 +13,7 @@ import type {
 import  { n1qlCheckURLExist } from './../queries/n1qlQueries'
 import { ulid } from 'ulid';
 
-export async function shortenUrl(longUrl: string): Promise<ShortenUrlResult | null> {
+export async function shortenUrl(longUrl: string): Promise<ShortenUrlResult> {
   try {
 
     const { cluster, collection }: ClusterConfig = await getCluster();
@@ -42,7 +42,7 @@ export async function shortenUrl(longUrl: string): Promise<ShortenUrlResult | nu
     const shortId : string = ulid();
     const shortUrl : string = `${baseUrl}:${port}/${shortId}`;
 
-    const newShortenerDoc: UrlShortDoc = {
+    const newUrlDoc: UrlShortDoc = {
       longUrl,
       shortUrl,
       createdAt: new Date().toISOString()
@@ -50,10 +50,10 @@ export async function shortenUrl(longUrl: string): Promise<ShortenUrlResult | nu
 
     console.log(`Inserting new document with ID: ${shortId}`);
 
-    let addNewShortenDoc: MutationResult;
-    addNewShortenDoc = await collection.upsert(shortId, newShortenerDoc);
+    let addNewUrlDoc: MutationResult;
+    addNewUrlDoc = await collection.upsert(shortId, newUrlDoc);
 
-    console.log(`Couchbase Upsert Result:`,  addNewShortenDoc);
+    console.log(`Couchbase Upsert Result:`, addNewUrlDoc);
     console.log("Document inserted successfully.");
     console.log("URL shortened successfully")
 
@@ -68,20 +68,19 @@ export async function shortenUrl(longUrl: string): Promise<ShortenUrlResult | nu
   }
 }
 
-// Function to fetch a URL
-export async function fetchUrl(urlUniqueId: string): Promise<FetchUrlResult> {
+export async function fetchUrl(urlId: string): Promise<FetchUrlResult> {
   try {
     const { collection }: ClusterConfig = await getCluster();
 
-    console.log(`Fetching document for ID: ${urlUniqueId}`);
+    console.log(`Fetching document for ID: ${urlId}`);
 
     let getUrl: { content: UrlShortDoc};
-    getUrl = await collection.get(urlUniqueId);
+    getUrl = await collection.get(urlId);
     return getUrl.content;
 
   } catch (error) {
     if ((error as CouchbaseError).code === 13) { // Couchbase error code 13 corresponds to "document not found"
-      console.log(`No document found for ID: ${urlUniqueId}`);
+      console.log(`No document found for ID: ${urlId}`);
 
       return null;
     } else {

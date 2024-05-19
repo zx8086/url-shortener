@@ -1,4 +1,4 @@
-GET http://localhost:3005/01HY73B00Y03K1VN3TT9DZR9JN
+GET http://localhost:3005/01HY87GQBFM4GM70MF7530EWZ0
 Accept: application/json
 
 ###
@@ -7,5 +7,5 @@ POST http://localhost:3005//shorten
 Content-Type: application/json
 
 {
-  "longUrl" : "httpa://awstip.com"
+  "longUrl" : "https://www.jetbrains.com/rider/whatsnew/"
 }
