@@ -1,26 +1,49 @@
 // src/lib/couchbaseConnector.ts
 import config from '../../config.ts';
-import { connect, type Cluster, type Bucket, type Scope, type Collection } from 'couchbase';
+import { connect, Cluster, Bucket, Scope, Collection } from 'couchbase';
 
 interface ErrorHandler {
-    handleError(error: Error): void;
+    handleError(error: Error): Promise<void>;
 }
 
 class GeneralErrorHandler implements ErrorHandler {
-    handleError(error: Error): void {
-        // Handle general error here
+    handleError(error: Error): Promise<void> {
+        console.error(`An error occurred: ${error.message}`);
+        return Promise.resolve();
     }
 }
 
 class TimeoutErrorHandler implements ErrorHandler {
-    handleError(error: Error): void {
-        // Handle timeout error here
+    private maxRetries: number = 3;
+    private retryCount: number = 0;
+
+    async handleError (error: Error): Promise<void> {
+        this.retryCount++;
+        console.error(`A timeout error occurred: ${error.message}`);
+
+        if (this.retryCount <= this.maxRetries) {
+            console.log('Retrying... Attempt: ', this.retryCount);
+            await clusterConn();
+        } else {
+            console.error('Max retry attempts exceeded.');
+        }
     }
 }
 
 class ConnectionErrorHandler implements ErrorHandler {
-    handleError(error: Error): void {
-        // Handle connection error here
+    private maxRetries: number = 3;
+    private retryCount: number = 0;
+
+    async handleError (error: Error): Promise<void> {
+        this.retryCount++;
+        console.error(`A connection error occurred: ${error.message}`);
+
+        if (this.retryCount <= this.maxRetries) {
+            console.log('Retrying... Attempt: ', this.retryCount);
+            await clusterConn();
+        } else {
+            console.error('Max retry attempts exceeded.');
+        }
     }
 }
 
