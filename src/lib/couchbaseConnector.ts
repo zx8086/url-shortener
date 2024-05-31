@@ -13,16 +13,17 @@ class GeneralErrorHandler implements ErrorHandler {
     }
 }
 
+let unambiguousTimeoutRetryCount = 0;
+
 class UnambiguousTimeoutErrorHandler implements ErrorHandler {
     private maxRetries: number = 3;
-    private retryCount: number = 0;
 
     async handleError (error: Error): Promise<void> {
-        this.retryCount++;
+        unambiguousTimeoutRetryCount++;
         console.error('An unambiguous timeout error occurred:', error.message);
 
-        if (this.retryCount <= this.maxRetries) {
-            console.log('Retrying... Attempt: ', this.retryCount);
+        if (unambiguousTimeoutRetryCount <= this.maxRetries) {
+            console.log('Retrying... Attempt: ', unambiguousTimeoutRetryCount);
             await clusterConn();
         } else {
             console.error('Max retry attempts exceeded.');
@@ -81,7 +82,7 @@ export async function clusterConn(): Promise<capellaConn> {
         general: new GeneralErrorHandler(),
         timeout: new TimeoutErrorHandler(),
         connection: new ConnectionErrorHandler(),
-        unambiguous_timeout: new UnambiguousTimeoutErrorHandler(),
+        UnambiguousTimeoutError: new UnambiguousTimeoutErrorHandler(),
     };
 
     try {
@@ -116,7 +117,8 @@ export async function clusterConn(): Promise<capellaConn> {
         return { cluster, bucket, scope, collection, connect };
 
     } catch (error: any) {
-        const errorName = error.name ? error.name.toLowerCase() : 'general';
+        console.error('Error name:', error.name);
+        const errorName = error.name ? error.name : 'general';  // Don't convert to lowercase
         const errorHandler = errorHandlersByType[errorName];
         if (errorHandler && error instanceof Error) {
             await errorHandler.handleError(error);
@@ -126,5 +128,5 @@ export async function clusterConn(): Promise<capellaConn> {
         }
     }
     // Return a default CapellaConn object or throw an error if the connection could not be established
-    throw new Error('Could not establish a Couchbase connection');
+    throw new Error('Could not establish a Couchbase Capella connection');
 }
