@@ -13,6 +13,23 @@ class GeneralErrorHandler implements ErrorHandler {
     }
 }
 
+class UnambiguousTimeoutErrorHandler implements ErrorHandler {
+    private maxRetries: number = 3;
+    private retryCount: number = 0;
+
+    async handleError (error: Error): Promise<void> {
+        this.retryCount++;
+        console.error('An unambiguous timeout error occurred:', error.message);
+
+        if (this.retryCount <= this.maxRetries) {
+            console.log('Retrying... Attempt: ', this.retryCount);
+            await clusterConn();
+        } else {
+            console.error('Max retry attempts exceeded.');
+        }
+    }
+}
+
 class TimeoutErrorHandler implements ErrorHandler {
     private maxRetries: number = 3;
     private retryCount: number = 0;
@@ -64,6 +81,7 @@ export async function clusterConn(): Promise<capellaConn> {
         general: new GeneralErrorHandler(),
         timeout: new TimeoutErrorHandler(),
         connection: new ConnectionErrorHandler(),
+        unambiguous_timeout: new UnambiguousTimeoutErrorHandler(),
     };
 
     try {
@@ -98,12 +116,11 @@ export async function clusterConn(): Promise<capellaConn> {
         return { cluster, bucket, scope, collection, connect };
 
     } catch (error: any) {
-        const errorHandler = errorHandlersByType[error.name];
-
+        const errorName = error.name ? error.name.toLowerCase() : 'general';
+        const errorHandler = errorHandlersByType[errorName];
         if (errorHandler && error instanceof Error) {
-            errorHandler.handleError(error);
+            await errorHandler.handleError(error);
         } else {
-            // Handle or throw the error if there's no specific error handler
             console.error("Unexpected error:", error);
             throw error;
         }
