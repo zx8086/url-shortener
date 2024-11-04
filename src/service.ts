@@ -1,6 +1,6 @@
 // src/service.ts
 import { getCluster } from './lib/clusterProvider.ts';
-import config from '../config.ts';
+import config from './config.ts';
 import type { MutationResult, QueryResult} from "couchbase";
 import type {
   UrlShortDoc,
@@ -10,8 +10,13 @@ import type {
   ShortenUrlResult,
   FetchUrlResult
 } from './lib/interfaces';
-import  { n1qlCheckURLExist } from './../queries/n1qlQueries'
+import  { n1qlCheckURLExist } from './queries/n1qlQueries.ts'
 import { ulid } from 'ulid';
+
+// Add this interface near your other interfaces
+interface CustomError extends Error {
+  code?: string | number;
+}
 
 export async function shortenUrl(longUrl: string): Promise<ShortenUrlResult> {
   try {
@@ -65,9 +70,19 @@ export async function shortenUrl(longUrl: string): Promise<ShortenUrlResult> {
     };
 
   } catch (error: any) {
-    console.error("Failed to shorten URL:", error.message);
+    console.error("Failed to shorten URL:", {
+      name: error.name,
+      message: error.message,
+      stack: error.stack
+    });
 
-    throw { name: error.constructor.name, message: error.message };
+    // Preserve the original error properties
+    const enhancedError = new Error(error.message) as CustomError;
+    enhancedError.name = error.name;
+    enhancedError.stack = error.stack;
+    if (error.code) enhancedError.code = error.code;
+
+    throw enhancedError;
   }
 }
 
@@ -81,14 +96,19 @@ export async function fetchUrl(urlId: string): Promise<FetchUrlResult> {
     getUrl = await collection.get(urlId);
     return getUrl.content;
 
-  } catch (error) {
-    if ((error as CouchbaseError).code === 13) { // Couchbase error code 13 corresponds to "document not found"
-      console.log(`No document found for ID: ${urlId}`);
+  } catch (error: any) {
+    console.error("Error fetching URL:", {
+      name: error.name,
+      message: error.message,
+      stack: error.stack
+    });
 
-      return null;
-    } else {
-      console.error("Error fetching URL:", (error as CouchbaseError).message);
-      throw error;
-    }
+    // Preserve the original error properties
+    const enhancedError = new Error(error.message) as CustomError;
+    enhancedError.name = error.name;
+    enhancedError.stack = error.stack;
+    if (error.code) enhancedError.code = error.code;
+
+    throw enhancedError;
   }
 }

@@ -1,4 +1,5 @@
 // interfaces.ts
+
 import {Bucket, Cluster, Collection, Scope} from "couchbase";
 
 export interface ClusterConfig {
@@ -16,7 +17,7 @@ export interface ShortenUrl {
 export interface UrlShortDoc {
     longUrl: string;
     shortUrl: string;
-    createdAt?: string; // optional parameter
+    createdAt?: string; 
 }
 
 export interface ErrorResponse {
@@ -29,7 +30,7 @@ export interface ErrorResponse {
 
 export interface CouchbaseError {
     code: number;
-    message?: string; // optional parameter
+    message?: string; 
 }
 
 export interface RequestBody {

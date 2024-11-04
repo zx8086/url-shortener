@@ -1,5 +1,5 @@
 // src/lib/couchbaseConnector.ts
-import config from '../../config.ts';
+import config from '../config.ts';
 import { connect, Cluster, Bucket, Scope, Collection } from 'couchbase';
 
 interface ErrorHandler {
