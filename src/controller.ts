@@ -1,7 +1,13 @@
-import Elysia from 'elysia';
-import { shortenUrl, fetchUrl } from './service.ts';
-import { isURLValid } from './lib/utils';
-import type { ShortenUrlResult, RequestBody, FetchUrlResult } from './lib/interfaces';
+// src/controller.ts
+
+import Elysia from "elysia";
+import { shortenUrl, fetchUrl } from "./service.ts";
+import { isURLValid } from "./lib/utils";
+import type {
+  ShortenUrlResult,
+  RequestBody,
+  FetchUrlResult,
+} from "./lib/interfaces";
 
 export const urlController = (app: Elysia): void => {
   app.post("/shorten", async (context) => {
@@ -21,15 +27,14 @@ export const urlController = (app: Elysia): void => {
 
       context.set.status = 200;
       return result;
-
     } catch (error: any) {
-      let message = error.message || 'Failed to shorten URL';
+      let message = error.message || "Failed to shorten URL";
       let status: number = 500;
 
-      if (error.name === 'DocumentNotFoundError') {
+      if (error.name === "DocumentNotFoundError") {
         status = 404;
       } else {
-        console.error('Error during URL shortening:', message);
+        console.error("Error during URL shortening:", message);
       }
 
       context.set.status = status;
@@ -53,14 +58,14 @@ export const urlController = (app: Elysia): void => {
         return { message: "Page not found" };
       }
     } catch (error: any) {
-      let message = error.message || 'Failed to fetch URL';
+      let message = error.message || "Failed to fetch URL";
       let status: number = 500;
 
-      if (error.name === 'DocumentNotFoundError') {
+      if (error.name === "DocumentNotFoundError") {
         status = 404;
         message = "Page not found";
       } else {
-        console.error('Error during URL fetching:', message);
+        console.error("Error during URL fetching:", message);
       }
 
       context.set.status = status;
