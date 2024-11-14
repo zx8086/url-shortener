@@ -8,6 +8,12 @@ import { swagger } from "@elysiajs/swagger";
 import { urlController } from "./controller.ts";
 import config from "./config.ts";
 
+function getExampleUrl(): string {
+  const baseUrl = config.elysiaJs.BASE_URL;
+  const port = config.elysiaJs.PORT;
+  return baseUrl.includes("localhost") ? `${baseUrl}:${port}` : baseUrl;
+}
+
 const app = new Elysia()
   .use(
     cors({
@@ -35,9 +41,9 @@ const app = new Elysia()
     swagger({
       documentation: {
         info: {
-          title: "URL Shortener API",
+          title: "BitLy URL Shortener API",
           version: "1.0.0",
-          description: "API for shortening and managing URLs",
+          description: "API for shortening and managing Tiny URLs",
         },
         tags: [
           { name: "URLs", description: "URL shortening endpoints" },
@@ -45,12 +51,12 @@ const app = new Elysia()
         ],
         servers: [
           {
-            url: `${config.elysiaJs.BASE_URL}:${config.elysiaJs.PORT}`,
+            url: getExampleUrl(),
             description: "Main server",
           },
         ],
         paths: {
-          "/shorten": {
+          "/tinyurl": {
             post: {
               tags: ["URLs"],
               summary: "Shorten a URL",
@@ -93,11 +99,11 @@ const app = new Elysia()
           schemas: {
             ShortenUrlRequest: {
               type: "object",
-              required: ["longUrl"],
+              required: ["tinyurl"],
               properties: {
-                longUrl: {
+                tinyurl: {
                   type: "string",
-                  description: "The URL to be shortened",
+                  description: "The Url to be shortened",
                   example: "https://svelte.dev/docs/kit/introduction",
                 },
               },
@@ -107,8 +113,8 @@ const app = new Elysia()
               properties: {
                 shortUrl: {
                   type: "string",
-                  description: "The shortened URL",
-                  example: `${config.elysiaJs.BASE_URL}:${config.elysiaJs.PORT}/01HQ5N8P8JK2X`,
+                  description: "The Tiny Url",
+                  example: `${getExampleUrl()}/01HQ5N8P8JK2X`,
                 },
                 message: {
                   type: "string",
@@ -138,6 +144,16 @@ app.onRequest(({ set }) => {
 });
 
 app
+  .get("/", () => ({
+    message: "Welcome to the BitLy URL Shortener API",
+    description: "A simple and fast URL shortening service",
+    documentation: "/swagger",
+    endpoints: {
+      shorten: "/tinyurl",
+      health: "/health",
+    },
+    version: "1.0.0",
+  }))
   .get("/favicon.ico", () => new Response(null, { status: 204 }))
   .get("/health", () => ({
     status: "healthy",
@@ -174,11 +190,9 @@ try {
   }
 
   app.listen(port, () => {
+    console.log(`🦊 URL Shortener is running at  ${getExampleUrl()}`);
     console.log(
-      `🦊 URL Shortener is running at ${config.elysiaJs.BASE_URL}:${port}`,
-    );
-    console.log(
-      `📚 Swagger documentation available at ${config.elysiaJs.BASE_URL}:${port}/swagger`,
+      `📚 Swagger documentation available at ${getExampleUrl()}/swagger`,
     );
   });
 } catch (error) {

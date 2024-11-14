@@ -118,7 +118,7 @@ export async function clusterConn(): Promise<capellaConn> {
     return { cluster, bucket, scope, collection, connect };
   } catch (error: any) {
     console.error("Error name:", error.name);
-    const errorName = error.name ? error.name : "general"; // Don't convert to lowercase
+    const errorName = error.name ? error.name : "general";
     const errorHandler = errorHandlersByType[errorName];
     if (errorHandler && error instanceof Error) {
       await errorHandler.handleError(error);

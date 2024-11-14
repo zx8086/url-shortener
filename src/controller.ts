@@ -10,7 +10,7 @@ import type {
 } from "./lib/interfaces";
 
 export const urlController = (app: Elysia): void => {
-  app.post("/shorten", async (context) => {
+  app.post("/tinyurl", async (context) => {
     try {
       const longUrl: string = (context.body as RequestBody).longUrl;
 
@@ -42,9 +42,9 @@ export const urlController = (app: Elysia): void => {
     }
   });
 
-  app.get("/:shortUrl", async (context) => {
+  app.get("/:tinyurl", async (context) => {
     try {
-      const shortId: string = context.params.shortUrl;
+      const shortId: string = context.params.tinyurl;
       const urlDoc: any = await fetchUrl(shortId);
 
       console.log("Fetching URL for unique ID:", urlDoc);

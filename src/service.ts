@@ -18,6 +18,15 @@ interface CustomError extends Error {
   code?: string | number;
 }
 
+function constructBaseUrl(baseUrl: string, port: string): string {
+  const cleanBaseUrl = baseUrl.replace(/\/+$/, "");
+  if (cleanBaseUrl.includes("localhost")) {
+    return `${cleanBaseUrl}:${port}`;
+  }
+
+  return cleanBaseUrl;
+}
+
 export async function shortenUrl(longUrl: string): Promise<ShortenUrlResult> {
   try {
     const { cluster, collection }: ClusterConfig = await getCluster();
@@ -47,7 +56,7 @@ export async function shortenUrl(longUrl: string): Promise<ShortenUrlResult> {
     const baseUrl: string = config.elysiaJs.BASE_URL;
     const port: string = config.elysiaJs.PORT;
     const shortId: string = ulid();
-    const shortUrl: string = `${baseUrl}:${port}/${shortId}`;
+    const shortUrl: string = `${constructBaseUrl(baseUrl, port)}/${shortId}`;
 
     const newUrlDoc: UrlShortDoc = {
       longUrl,
