@@ -42,7 +42,7 @@ const app = new Elysia()
       documentation: {
         info: {
           title: "BitLy URL Shortener API",
-          version: "1.0.0",
+          version: "1.0.1",
           description: "API for shortening and managing Tiny URLs",
         },
         tags: [
@@ -114,7 +114,7 @@ const app = new Elysia()
                 shortUrl: {
                   type: "string",
                   description: "The Tiny Url",
-                  example: `${getExampleUrl()}/01HQ5N8P8JK2X`,
+                  example: `${getExampleUrl()}01HQ5N8P8JK2X`,
                 },
                 message: {
                   type: "string",
@@ -148,11 +148,11 @@ app
     message: "Welcome to the BitLy URL Shortener API",
     description: "A simple and fast URL shortening service",
     documentation: "/swagger",
-    endpoints: {
-      shorten: "/tinyurl",
-      health: "/health",
-    },
-    version: "1.0.0",
+    // endpoints: {
+    //   shorten: "/tinyurl",
+    //   health: "/health",
+    // },
+    version: "1.0.1",
   }))
   .get("/favicon.ico", () => new Response(null, { status: 204 }))
   .get("/health", () => ({
